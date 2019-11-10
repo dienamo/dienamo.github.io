@@ -1,8 +1,8 @@
 class spaceShip {
 
     constructor() {
-        this.x = canvas.width / 2;
-        this.y = canvas.height - 300; 
+        this.x = canvas.width / 2 - 50;
+        this.y = canvas.height - 100; 
         this.w = 100;
         this.h = 100;
         this.speedX = 0;

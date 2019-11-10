@@ -25,6 +25,8 @@ function menu() {
 
     ennemiesArray = [];
 
+    enemiesBulletArray = [];
+
     newHealth();
 
     gameOver = false;
@@ -38,7 +40,7 @@ function scoreBoard() {
     ctx.fillStyle = 'white';
     ctx.font = '36px STARWARS';
     ctx.fillText(`Score : ${score}`, 1050 , 50);
-    ctx.fillText("Health :" , 1050 , 100);
+    ctx.fillText("Health :" , 1030 , 100);
 }
 
 function showGameOver() {
@@ -49,6 +51,21 @@ function showGameOver() {
     ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 4);
     ctx.font = '24px STARWARS';
     ctx.fillText('Click to restart', canvas.width / 2, canvas.height / 2);
+    ctx.font = '24px STARWARS';
+    ctx.fillText(`Your Score : ${score}` , canvas.width / 2, canvas.height / 3);
+    document.querySelector("body").addEventListener('click', startGame);
+  }
+
+  function showYouWin() {
+    ctx.clearRect(0 , 0 , canvas.width , canvas.height);
+    ctx.fillStyle = 'white';
+    ctx.font = '36px STARWARS';
+    ctx.textAlign = 'center';
+    ctx.fillText('YOU WIN !', canvas.width / 2, canvas.height / 4);
+    ctx.font = '24px STARWARS';
+    ctx.font = '24px STARWARS';
+    ctx.fillText(`Your Score : ${score}` , canvas.width / 2, canvas.height / 3);
+    ctx.fillText('Click to restart', canvas.width / 2, canvas.height / 2);
     document.querySelector("body").addEventListener('click', startGame);
   }
 
@@ -58,6 +75,8 @@ var frames = 0;
 
 var gameOver = false;
 
+var youWin = false;
+
 var vaisseauMere = new spaceShip();
 
 var ennemiesArray = [];
@@ -65,8 +84,6 @@ var ennemiesArray = [];
 var healthArray = [];
 
 var enemiesFrequence = 300;
-
-
 
 function newHealth() {
     health1 = new HealthIcon(1120 , 70);
@@ -117,19 +134,6 @@ function keysMove() {
     }
 }
 
-function explode() {
-    const img1 = document.createElement('img');
-    img1.src = "./images/explode/explode1.png";
-    ctx.drawImage(img1, 400 , 400 , 150 , 150);
-}
-
-// function newEnnemies() {
-//     setInterval(function() {
-//         enemie = new enemieship();
-//         ennemiesArray.push(enemie);
-//     }, enemiesFrequence)
-// }
-
 function moreEnnemies() {
     setInterval(function() {
         return enemiesFrequence -= 60;
@@ -148,6 +152,7 @@ function handleCollisions() {
     ennemiesArray.forEach(function(enemy , i) {
         vaisseauMere.playerBulletArray.forEach(function(bullet) {
         if (detectCollision(bullet, enemy)) {
+          drawExplosion(enemy.x , enemy.y)
           ennemiesArray.splice(i , 1);
           score ++;
         }
@@ -155,8 +160,10 @@ function handleCollisions() {
     });
     ennemiesArray.forEach(function(enemy , i) {
         if(detectCollision(enemy , vaisseauMere)){
+            drawExplosion(enemy.x , enemy.y)
+            drawExplosion(vaisseauMere.x , vaisseauMere.y)
             ennemiesArray.splice(i , 1);
-            healthArray.pop();
+            healthArray.splice(0 , 1);
             if(healthArray.length === 0){
                 gameOver = true;
             }
@@ -165,8 +172,9 @@ function handleCollisions() {
     ennemiesArray.forEach(function(enemy , i) {
         enemy.enemiesBulletArray.forEach(function(bullet , i) {
             if(detectCollision(vaisseauMere , bullet)){
+                drawExplosion(vaisseauMere.x , vaisseauMere.y)
                 enemy.enemiesBulletArray.splice(i , 1);
-                healthArray.pop();
+                healthArray.splice(0 , 1);
                 if(healthArray.length === 0){
                 gameOver = true;
             }
@@ -174,6 +182,33 @@ function handleCollisions() {
         })   
     })
 }
+const img = document.createElement('img');
+img.src = "./images/explode/explode.png"
+
+var explodeX;
+var explodeY;
+var srcX;
+var srcY;
+sheetWidth = 1080;
+sheetHeight = 130;
+cols = 9;
+rows = 1;
+w = sheetWidth / cols;
+h = sheetHeight / rows;
+var currentFrame = 0;
+function updateExplosion(explodeX , explodeY){
+	//Updating the frame index 
+	currentFrame = ++currentFrame % cols; 
+	//Calculating the x coordinate for spritesheet 
+    srcX = ++currentFrame * w;
+    srcY = 0;
+    ctx.clearRect(explodeX , explodeY , w , h);
+}
+
+function drawExplosion(explodeX , explodeY) {
+    updateExplosion(explodeX , explodeY);
+    ctx.drawImage(img, srcX , srcY , w , h , explodeX , explodeY, w , h);
+};
 
 /*
 ##     ## ########  ########     ###    ######## ######## 
@@ -185,7 +220,6 @@ function handleCollisions() {
  #######  ##        ########  ##     ##    ##    ######## 
 */
 function update() {
-
     frames++;
     ctx.clearRect(0 , 0 , canvas.width , canvas.height);
     vaisseauMere.sound.play();
@@ -216,7 +250,7 @@ function update() {
             ennemie.moveRight();
         }
 
-        if (frames % Math.floor(Math.random()*120) === 0) {
+        if (frames % Math.floor(Math.random()*240) === 0) {
             ennemie.shoot();
         }
 
@@ -235,10 +269,6 @@ function update() {
         } else if (ennemie.x <= 50) {
             ennemie.x = 50;
         }
-    
-        // if (ennemie.y > canvas.height) {
-            
-        // } 
 
         ennemie.enemiesBulletArray.forEach(bullet => {
             bullet.draw();
@@ -255,6 +285,10 @@ function update() {
     handleCollisions();
     
     scoreBoard();
+
+    if(score >= 50){
+        showYouWin();
+    }
     
     if(!gameOver){
         requestAnimationFrame(update);

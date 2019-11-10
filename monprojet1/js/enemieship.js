@@ -12,6 +12,9 @@ class enemieship {
         this.img = img;
         img.src = "./images/tiedrop.png"
         this.enemiesBulletArray = [];
+        const sound = document.createElement("audio");
+        this.sound = sound;
+        sound.src = "./sound/tiefighter.mp3"
     }
     draw() {
         ctx.drawImage(this.img, this.x , this.y , this.w , this.h);
@@ -34,5 +37,6 @@ class enemieship {
     shoot() {
         var bullet = new RedLaser(this.x + 15 , this.y + 60);
         this.enemiesBulletArray.push(bullet);
+        this.sound.play();
     }
 }
