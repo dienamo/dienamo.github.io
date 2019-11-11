@@ -14,6 +14,8 @@ function menu() {
     ctx.fillText('Click to Start', canvas.width / 2, canvas.height / 2);
     ctx.font = '18px Arial';
     ctx.fillText('Up/Down/Right/Left keys to move, Space to shoot.', canvas.width / 2, (canvas.height / 4) * 3);
+    ctx.font = '18px Arial';
+    ctx.fillText('Destroy 50 Tie Fighters To Win!', canvas.width / 2, (canvas.height / 4 ) * 1.5);
     document.querySelector("body").addEventListener('click', startGame);
   }
 
@@ -296,7 +298,6 @@ function update() {
     else{
         showGameOver();
     }
-
 }
 
 /*
