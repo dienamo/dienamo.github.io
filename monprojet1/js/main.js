@@ -102,7 +102,6 @@ function keysMove() {
             vaisseauMere.speedY--;
         }
     }
-    
     if (vaisseauMere.keys[40]) {
         if (vaisseauMere.speedY < vaisseauMere.speed) {
             vaisseauMere.speedY++;
